@@ -10,7 +10,7 @@ app.get('/', function(req, res){
     res.sendFile(__dirname+"/index.html");
 });
 
-http.listen(3000, function(){
+http.listen(process.env.PORT || 3000, function(){
     console.log('listening on *:3000');
 });
 
@@ -18,23 +18,26 @@ var players = {};
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
-      x: 0,
-      y: 0
+      x: 100+Math.random()*100,
+      y: 100+Math.random()*100,
+      r: Math.random()*250,
+      g: Math.random()*250,
+      b: Math.random()*250
     };
   });
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
     if (data.left) {
-      player.x -= 1;
+      player.x -= 5;
     }
     if (data.up) {
-      player.y -= 1;
+      player.y -= 5;
     }
     if (data.right) {
-      player.x += 1;
+      player.x += 5;
     }
     if (data.down) {
-      player.y += 1;
+      player.y += 5;
     }
   });
 });
