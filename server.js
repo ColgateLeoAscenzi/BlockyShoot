@@ -40,6 +40,9 @@ io.on('connection', function(socket) {
       player.y += 5;
     }
   });
+  socket.on('disconnect', function() {
+      players[socket.id] = {};
+ });
 });
 
 setInterval(function() {
