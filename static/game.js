@@ -108,6 +108,10 @@ socket.on('state', function(players) {
             scene.add(playerMeshes[id]);
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
+        if(socket.id == id){
+            camera.position.set(player.x,player.y+10,player.z+30);
+            camera.lookAt(player.x,player.y,player.z);
+        }
     }
   }
   renderer.render(scene, camera);
