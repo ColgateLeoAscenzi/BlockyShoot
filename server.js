@@ -27,35 +27,35 @@ io.on('connection', function(socket) {
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
     if (data.left) {
-        if(player.x -2 > - 10000){
+        if(player.x -2 > - 2500){
             player.x -= 2;
         }
         else{
-            player.x = -10000;
+            player.x = -2500;
         }
     }
     if (data.up) {
-        if(player.z -2 > - 10000){
+        if(player.z -2 > - 2500){
             player.z -= 2;
         }
         else{
-            player.z = -10000;
+            player.z = -2500;
         }
     }
     if (data.right) {
-        if(player.x + 2 <  10000){
+        if(player.x + 2 <  2500){
             player.x += 2;
         }
         else{
-            player.x = 10000;
+            player.x = 2500;
         }
     }
     if (data.down) {
-        if(player.z + 2 <  10000){
+        if(player.z + 2 <  2500){
             player.z += 2;
         }
         else{
-            player.z = 10000;
+            player.z = 2500;
         }
     }
   });

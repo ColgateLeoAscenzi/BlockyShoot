@@ -88,7 +88,14 @@ function createPlayer(color){
 function createScene(){
     scene = new THREE.Scene();
 
-    var geometry = new THREE.BoxGeometry(10000,2,10000,1,1,1);
+    var geomBox = new THREE.BoxBufferGeometry(10000, 10000, 10000, 10, 10, 10);
+    var matBox  = new THREE.MeshBasicMaterial(
+                               { color : worldColors.skyBlue});
+    var box = new THREE.Mesh(geomBox, matBox);
+    box.material.side = THREE.BackSide;
+    scene.add(box);
+    
+    var geometry = new THREE.BoxGeometry(2500,2,2500,1,1,1);
     var material = new THREE.MeshBasicMaterial({color : 0x000000});
     var plane = new THREE.Mesh( geometry, material );
     scene.add( plane );
