@@ -27,16 +27,36 @@ io.on('connection', function(socket) {
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
     if (data.left) {
-      player.x -= 2;
+        if(player.x -2 > - 10000){
+            player.x -= 2;
+        }
+        else{
+            player.x = -10000;
+        }
     }
     if (data.up) {
-      player.z -= 2;
+        if(player.z -2 > - 10000){
+            player.z -= 2;
+        }
+        else{
+            player.z = -10000;
+        }
     }
     if (data.right) {
-      player.x += 2;
+        if(player.x + 2 <  10000){
+            player.x += 2;
+        }
+        else{
+            player.x = 10000;
+        }
     }
     if (data.down) {
-      player.z += 2;
+        if(player.z + 2 <  10000){
+            player.z += 2;
+        }
+        else{
+            player.z = 10000;
+        }
     }
   });
 

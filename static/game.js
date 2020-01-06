@@ -88,7 +88,7 @@ function createPlayer(color){
 function createScene(){
     scene = new THREE.Scene();
 
-    var geometry = new THREE.BoxGeometry(100,2,100,1,1,1);
+    var geometry = new THREE.BoxGeometry(10000,2,10000,1,1,1);
     var material = new THREE.MeshBasicMaterial({color : 0x000000});
     var plane = new THREE.Mesh( geometry, material );
     scene.add( plane );
@@ -109,7 +109,7 @@ socket.on('state', function(players) {
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
         if(socket.id == id){
-            camera.position.set(player.x,player.y+10,player.z+30);
+            camera.position.set(player.x,player.y+20,player.z+50);
             camera.lookAt(player.x,player.y,player.z);
         }
     }
