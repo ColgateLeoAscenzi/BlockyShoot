@@ -77,9 +77,9 @@ function handleWindowResize() {
 //       requestAnimationFrame(loop);
 // }
 
-function createPlayer(){
+function createPlayer(color){
     var playerBoxGeom = new THREE.BoxGeometry(10,10,10,1,1,1);
-    var playerBoxMat  = new THREE.MeshPhongMaterial({color : Math.random()*0xffffff});
+    var playerBoxMat  = new THREE.MeshPhongMaterial({color : color});
     var playerBoxMesh = new THREE.Mesh(playerBoxGeom, playerBoxMat);
     return playerBoxMesh;
     // scene.add(playerBoxMesh);
@@ -104,7 +104,7 @@ socket.on('state', function(players) {
     var player = players[id];
     if (player != {}){
         if(playerMeshes[id] == undefined){
-            playerMeshes[id] = createPlayer();
+            playerMeshes[id] = createPlayer(player.color);
             scene.add(playerMeshes[id]);
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);

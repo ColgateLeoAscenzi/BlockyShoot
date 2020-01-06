@@ -21,6 +21,7 @@ io.on('connection', function(socket) {
       x: -20+Math.random()*20,
       y: 7,
       z: -20+Math.random()*20,
+      color: Math.random()*0xffffff,
     };
   });
   socket.on('movement', function(data) {
