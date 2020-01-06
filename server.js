@@ -18,28 +18,27 @@ var players = {};
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
-      x: 100+Math.random()*100,
-      y: 100+Math.random()*100,
-      r: Math.random()*250,
-      g: Math.random()*250,
-      b: Math.random()*250
+      x: -20+Math.random()*20,
+      y: 7,
+      z: -20+Math.random()*20,
     };
   });
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
     if (data.left) {
-      player.x -= 5;
+      player.x -= 2;
     }
     if (data.up) {
-      player.y -= 5;
+      player.z -= 2;
     }
     if (data.right) {
-      player.x += 5;
+      player.x += 2;
     }
     if (data.down) {
-      player.y += 5;
+      player.z += 2;
     }
   });
+
   socket.on('disconnect', function() {
       players[socket.id] = {};
  });
