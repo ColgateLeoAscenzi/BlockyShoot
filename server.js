@@ -26,6 +26,7 @@ io.on('connection', function(socket) {
   });
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
+    console.log(player);
     if (data.left) {
         if(player.x -2 > - 180){
             player.x -= 2;
