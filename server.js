@@ -21,27 +21,42 @@ io.on('connection', function(socket) {
       x: -20+Math.random()*20,
       y: 7,
       z: -20+Math.random()*20,
+      velocity: 0,
       color: Math.random()*0xffffff,
       yrotation: 0,
     };
   });
+
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
     //console.log(player);
     if (data.left) {
         player.yrotation+=0.05;
     }
-    if (data.up) {
-        player.z-=2*Math.cos(player.yrotation);
-        player.x-=2*Math.sin(player.yrotation);
+    if (data.down) {
+        if(player.velocity + 0.25 < 2){
+            player.velocity += 0.25;
+        }
+        else{
+            player.velocity = 2;
+        }
     }
+
     if (data.right) {
         player.yrotation-=0.05;
 
     }
-    if (data.down) {
-        player.z+=2*Math.cos(player.yrotation);
-        player.x+=2*Math.sin(player.yrotation);
+    if (data.up) {
+        if(player.velocity - 0.25 > -2){
+            player.velocity -= 0.25;
+        }
+        else{
+            player.velocity = - 2;
+        }
+    }
+    if(!data.down && !data.up){
+        //kill momentum
+        player.velocity = player.velocity*0.88;
     }
     if(player.x > 180){
         player.x = 180;
@@ -55,6 +70,9 @@ io.on('connection', function(socket) {
     if(player.z < -180){
         player.z = -180;
     }
+
+    player.z+=player.velocity*Math.cos(player.yrotation);
+    player.x+=player.velocity*Math.sin(player.yrotation);
   });
 
   socket.on('disconnect', function() {
@@ -63,12 +81,14 @@ io.on('connection', function(socket) {
 });
 
 setInterval(function() {
+  //update places
   io.sockets.emit('state', players);
+
+  //ping
   var d = new Date();
   var n = d.getTime();
   io.sockets.emit('ping', n);
 }, 1000 / 60);
-
 
 
 // setInterval(function() {

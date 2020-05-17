@@ -17,7 +17,7 @@ var HEIGHT, WIDTH
 var playerMeshes = {};
 
 var lastPing = [];
-var ROLLAVG = 100;
+var ROLLAVG = 60;
 
 createCanvas();
 
@@ -98,7 +98,7 @@ function createScene(){
     box.material.side = THREE.BackSide;
     scene.add(box);
 
-    var geometry = new THREE.BoxGeometry(180,2,180,1,1,1);
+    var geometry = new THREE.BoxGeometry(360,2,360,1,1,1);
     var material = new THREE.MeshBasicMaterial({color : 0x000000});
     var plane = new THREE.Mesh( geometry, material );
     scene.add( plane );
@@ -119,8 +119,8 @@ socket.on('state', function(players) {
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
         if(socket.id == id){
-            camera.position.set(player.x,player.y+20,player.z+50);
-            camera.lookAt(player.x,player.y,player.z);
+            camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
+            camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
             playerMeshes[id].rotation.y = player.yrotation;
         }
     }
@@ -147,6 +147,6 @@ socket.on('ping', function(time){
         avg = avg/ROLLAVG;
         lastPing = newHist;
     }
-    document.getElementById("ping").innerHTML = avg+" ms";
+    document.getElementById("ping").innerHTML = Math.round(avg)+" ms";
     // console.log("Pong",n-time,"ms");
 });
