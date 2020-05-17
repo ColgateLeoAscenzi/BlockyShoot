@@ -6,3 +6,11 @@ body{
 #glcanvas{
     background-color: rgba(255,255,255,1);
 }
+
+#ping{
+    background-color: rgba(0,0,0,0.7);
+    position:absolute;
+    left:0;
+    top:0;
+    color:white;
+}

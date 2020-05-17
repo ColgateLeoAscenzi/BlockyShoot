@@ -16,6 +16,9 @@ var HEIGHT, WIDTH
 
 var playerMeshes = {};
 
+var lastPing = [];
+var ROLLAVG = 100;
+
 createCanvas();
 
 createScene();
@@ -123,4 +126,27 @@ socket.on('state', function(players) {
     }
   }
   renderer.render(scene, camera);
+});
+
+socket.on('ping', function(time){
+    var d = new Date();
+    var n = d.getTime();
+    var avg = 0;
+    if(lastPing.length < ROLLAVG){
+        lastPing.push((n-time)*2);
+        avg = n-time;
+    }
+    else{
+        var newHist = [];
+        for(var i = 1; i < lastPing.length; i++){
+            newHist[i-1] = lastPing[i];
+            avg += lastPing[i];
+        }
+        newHist.push((n-time)*2);
+        avg +=(n-time)*2;
+        avg = avg/ROLLAVG;
+        lastPing = newHist;
+    }
+    document.getElementById("ping").innerHTML = avg+" ms";
+    // console.log("Pong",n-time,"ms");
 });

@@ -64,7 +64,11 @@ io.on('connection', function(socket) {
 
 setInterval(function() {
   io.sockets.emit('state', players);
+  var d = new Date();
+  var n = d.getTime();
+  io.sockets.emit('ping', n);
 }, 1000 / 60);
+
 
 
 // setInterval(function() {
