@@ -132,9 +132,10 @@ socket.on('ping', function(time){
     var d = new Date();
     var n = d.getTime();
     var avg = 0;
+    console.log(n-time);
     if(lastPing.length < ROLLAVG){
         lastPing.push((n-time)*2);
-        avg = n-time;
+        avg = (n-time)*2;
     }
     else{
         var newHist = [];
