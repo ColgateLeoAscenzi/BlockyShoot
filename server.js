@@ -22,42 +22,38 @@ io.on('connection', function(socket) {
       y: 7,
       z: -20+Math.random()*20,
       color: Math.random()*0xffffff,
+      yrotation: 0,
     };
   });
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
-    console.log(player);
+    //console.log(player);
     if (data.left) {
-        if(player.x -2 > - 180){
-            player.x -= 2;
-        }
-        else{
-            player.x = -180;
-        }
+        player.yrotation+=0.05;
     }
     if (data.up) {
-        if(player.z -2 > - 180){
-            player.z -= 2;
-        }
-        else{
-            player.z = -180;
-        }
+        player.z-=2*Math.cos(player.yrotation);
+        player.x-=2*Math.sin(player.yrotation);
     }
     if (data.right) {
-        if(player.x + 2 <  180){
-            player.x += 2;
-        }
-        else{
-            player.x = 180;
-        }
+        player.yrotation-=0.05;
+
     }
     if (data.down) {
-        if(player.z + 2 <  180){
-            player.z += 2;
-        }
-        else{
-            player.z = 180;
-        }
+        player.z+=2*Math.cos(player.yrotation);
+        player.x+=2*Math.sin(player.yrotation);
+    }
+    if(player.x > 180){
+        player.x = 180;
+    }
+    if(player.x < - 180){
+        player.x = - 180;
+    }
+    if(player.z > 180){
+        player.z = 180;
+    }
+    if(player.z < -180){
+        player.z = -180;
     }
   });
 

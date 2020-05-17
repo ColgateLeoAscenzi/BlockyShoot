@@ -4,6 +4,7 @@ var movement = {
   left: false,
   right: false
 }
+
 document.addEventListener('keydown', function(event) {
   switch (event.keyCode) {
     case 65: // A
