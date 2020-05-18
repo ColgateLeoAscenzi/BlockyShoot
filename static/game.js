@@ -128,14 +128,15 @@ socket.on('state', function(players) {
   renderer.render(scene, camera);
 });
 
-socket.on('ping', function(time){
-    var d = new Date();
-    var n = d.getTime();
-    var avg = 0;
-    console.log(n-time);
+
+var latency = 0;
+
+socket.on('pong', function(ms) {
+    latency = ms;
+
     if(lastPing.length < ROLLAVG){
-        lastPing.push((n-time)*2);
-        avg = (n-time)*2;
+        lastPing.push(latency);
+        avg = latency;
     }
     else{
         var newHist = [];
@@ -143,11 +144,11 @@ socket.on('ping', function(time){
             newHist[i-1] = lastPing[i];
             avg += lastPing[i];
         }
-        newHist.push((n-time)*2);
-        avg +=(n-time)*2;
+        newHist.push(latency);
+        avg +=latency;
         avg = avg/ROLLAVG;
         lastPing = newHist;
     }
     document.getElementById("ping").innerHTML = Math.round(avg)+" ms";
-    // console.log("Pong",n-time,"ms");
+    //console.log(latency);
 });

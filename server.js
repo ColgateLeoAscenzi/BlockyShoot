@@ -1,8 +1,9 @@
 var express = require('express');
-var app = require('express')();
+var app = express();
 var http = require('http').createServer(app);
 var path = require('path');
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {pingInterval: 5000});
+var THREE = require('./static/lib/three.min.js');
 
 app.use('/static', express.static(__dirname + '/static'));
 
@@ -15,6 +16,9 @@ http.listen(process.env.PORT || 3000, function(){
 });
 
 var players = {};
+
+var scene = new THREE.Scene();
+
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
@@ -84,10 +88,7 @@ setInterval(function() {
   //update places
   io.sockets.emit('state', players);
 
-  //ping
-  var d = new Date();
-  var n = d.getTime();
-  io.sockets.emit('ping', n);
+
 }, 1000 / 60);
 
 
