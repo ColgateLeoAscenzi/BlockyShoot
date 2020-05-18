@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var path = require('path');
-const io = require('socket.io')(http, {pingInterval: 5000});
+const io = require('socket.io')(http, {pingInterval: 1000});
 var THREE = require('./static/lib/three.min.js');
 
 app.use('/static', express.static(__dirname + '/static'));
@@ -16,6 +16,7 @@ http.listen(process.env.PORT || 3000, function(){
 });
 
 var players = {};
+var playerMeshes = {};
 
 var scene = new THREE.Scene();
 
@@ -29,6 +30,10 @@ io.on('connection', function(socket) {
       color: Math.random()*0xffffff,
       yrotation: 0,
     };
+
+    playerMeshes[socket.id] = createPlayer(players[socket.id].color);
+    scene.add(playerMeshes[socket.id]);
+
   });
 
   socket.on('movement', function(data) {
@@ -85,13 +90,22 @@ io.on('connection', function(socket) {
 });
 
 setInterval(function() {
-  //update places
   io.sockets.emit('state', players);
-
-
 }, 1000 / 60);
 
 
-// setInterval(function() {
-//   io.sockets.emit('message', 'Polling');
-// }, 1000);
+
+
+
+
+
+
+
+//threeD stuff
+function createPlayer(color){
+    var playerBoxGeom = new THREE.BoxGeometry(10,10,10,1,1,1);
+    var playerBoxMat  = new THREE.MeshPhongMaterial({color : color});
+    var playerBoxMesh = new THREE.Mesh(playerBoxGeom, playerBoxMat);
+    return playerBoxMesh;
+    // scene.add(playerBoxMesh);
+}

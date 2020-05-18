@@ -118,6 +118,7 @@ socket.on('state', function(players) {
             scene.add(playerMeshes[id]);
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
+        playerMeshes[id].rotation.y = player.yrotation;
         if(socket.id == id){
             camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
             camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
