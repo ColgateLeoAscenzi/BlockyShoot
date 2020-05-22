@@ -15,6 +15,7 @@ var mouse = new THREE.Vector2();
 var HEIGHT, WIDTH
 
 var playerMeshes = {};
+var liveBullets = [];
 
 var lastPing = [];
 var ROLLAVG = 60;
@@ -27,6 +28,8 @@ createScene();
 
 setInterval(function() {
   socket.emit('movement', movement);
+  updateBullets();
+
 }, 1000 / 60);
 
 
@@ -88,6 +91,13 @@ function createPlayer(color){
     // scene.add(playerBoxMesh);
 }
 
+function createBullet(){
+    var bulletGeom = new THREE.BoxGeometry(10,2,2,1,1,1);
+    var bulletMat = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
+    var bulletMesh = new THREE.Mesh(bulletGeom, bulletMat);
+    return bulletMesh;
+}
+
 function createScene(){
     scene = new THREE.Scene();
 
@@ -106,8 +116,8 @@ function createScene(){
 
     var ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
-
 }
+
 
 socket.on('state', function(players) {
   for (var id in players) {
@@ -119,7 +129,21 @@ socket.on('state', function(players) {
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
         playerMeshes[id].rotation.y = player.yrotation;
+        //shrink player on death
+        if(!player.isAlive){
+            playerMeshes[id].scale.set((Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10));
+        }
+        else{
+            playerMeshes[id].scale.set(1,1,1);
+        }
+
         if(socket.id == id){
+            if(!player.isAlive){
+                document.getElementById("respawn").innerHTML = "You Died, Respawn in<br>"+Math.round((player.deathTimer*(1000/60))/1000)+" s";
+            }
+            else{
+                document.getElementById("respawn").innerHTML = "";
+            }
             camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
             camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
             playerMeshes[id].rotation.y = player.yrotation;
@@ -129,6 +153,17 @@ socket.on('state', function(players) {
   renderer.render(scene, camera);
 });
 
+var objectLoader = new THREE.ObjectLoader();
+
+
+socket.on('shot', function(bullet){
+    objectLoader.parse( bullet, function ( obj ) {
+        liveBullets.push(obj);
+        scene.add(obj);
+        obj.position.set(obj.userData["x"],obj.userData["y"],obj.userData["z"]);
+        obj.rotation.y = obj.userData["yrotation"];
+    } );
+});
 
 var latency = 0;
 
@@ -153,3 +188,16 @@ socket.on('pong', function(ms) {
     document.getElementById("ping").innerHTML = Math.round(avg)+" ms";
     //console.log(latency);
 });
+
+function updateBullets(){
+    for(var i = 0; i < liveBullets.length; i++){
+        liveBullets[i].position.z-=8*Math.cos(liveBullets[i].userData["yrotation"]);
+        liveBullets[i].position.x-=8*Math.sin(liveBullets[i].userData["yrotation"]);
+        liveBullets[i].userData["z"] -= 8*Math.cos(liveBullets[i].userData["yrotation"]);
+        liveBullets[i].userData["x"] -= 8*Math.sin(liveBullets[i].userData["yrotation"]);
+        if(new Date().getTime() >= liveBullets[i].userData["deathTime"]){
+            scene.remove(liveBullets[i]);
+            liveBullets.shift();
+        }
+    }
+}

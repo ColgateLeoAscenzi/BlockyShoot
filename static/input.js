@@ -2,7 +2,8 @@ var movement = {
   up: false,
   down: false,
   left: false,
-  right: false
+  right: false,
+  space: false,
 }
 
 document.addEventListener('keydown', function(event) {
@@ -19,6 +20,9 @@ document.addEventListener('keydown', function(event) {
     case 83: // S
       movement.down = true;
       break;
+    case 32: //space
+      movement.space = true;
+      break;
   }
 });
 document.addEventListener('keyup', function(event) {
@@ -34,6 +38,9 @@ document.addEventListener('keyup', function(event) {
       break;
     case 83: // S
       movement.down = false;
+      break;
+    case 32: //space
+      movement.space = false;
       break;
   }
 });
