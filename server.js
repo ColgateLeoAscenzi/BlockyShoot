@@ -34,7 +34,7 @@ io.on('connection', function(socket) {
       color: Math.random()*0xffffff,
       yrotation: 0,
       canShoot: true,
-      shootCooldown: 60,
+      shootCooldown: 15,
       isAlive: true,
       deathTimer: 300,
     };
@@ -108,7 +108,7 @@ io.on('connection', function(socket) {
     if(!player.canShoot){
         player.shootCooldown--;
         if(player.shootCooldown <=0){
-            player.shootCooldown = 30;
+            player.shootCooldown = 15;
             player.canShoot = true;
         }
     }
