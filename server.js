@@ -216,7 +216,7 @@ function updateBullets(){
                 if(hitPlayer.object.name != liveBullets[i].userData["shotBy"] && players[hitPlayer.object.name].isAlive && hitPlayer.distance <= 5){
                     players[hitPlayer.object.name].isAlive = false;
                     scene.remove(liveBullets[i]);
-                    player.deathTimer = 300;
+                    players[hitPlayer.object.name].deathTimer = 300;
                     break;
                 }
 
