@@ -37,6 +37,28 @@ setInterval(function() {
 
 function createCanvas() {
 
+    HEIGHT = window.innerHeight;
+    WIDTH = window.innerWidth;
+
+    aspectRatio = WIDTH / HEIGHT;
+    fieldOfView = 60;
+    nearPlane = 1;
+    farPlane = 10000;
+    camera = new THREE.PerspectiveCamera(
+        fieldOfView,
+        aspectRatio,
+        nearPlane,
+        farPlane
+      );
+    //
+    camera.position.x = 0;
+    camera.position.z = 120;
+    camera.position.y = 40;
+
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(WIDTH, HEIGHT);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   container = document.getElementById('glcanvas');
   container.appendChild(renderer.domElement);
