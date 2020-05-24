@@ -20,6 +20,7 @@ var liveBullets = [];
 var lastPing = [];
 var ROLLAVG = 60;
 
+
 createCanvas();
 
 createScene();
@@ -36,28 +37,6 @@ setInterval(function() {
 
 function createCanvas() {
 
-  HEIGHT = window.innerHeight;
-  WIDTH = window.innerWidth;
-
-  aspectRatio = WIDTH / HEIGHT;
-  fieldOfView = 60;
-  nearPlane = 1;
-  farPlane = 10000;
-  camera = new THREE.PerspectiveCamera(
-      fieldOfView,
-      aspectRatio,
-      nearPlane,
-      farPlane
-    );
-  //
-  camera.position.x = 0;
-  camera.position.z = 120;
-  camera.position.y = 40;
-
-  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(WIDTH, HEIGHT);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   container = document.getElementById('glcanvas');
   container.appendChild(renderer.domElement);
@@ -116,6 +95,7 @@ function createScene(){
 
     var ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
+
 }
 
 
@@ -146,6 +126,8 @@ socket.on('state', function(players) {
             }
             camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
             camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
+            // camera.position.set(player.x,player.y+500,player.z);
+            // camera.lookAt(player.x,player.y,player.z);
             playerMeshes[id].rotation.y = player.yrotation;
         }
     }
@@ -189,12 +171,42 @@ socket.on('pong', function(ms) {
     //console.log(latency);
 });
 
+socket.on('plsdrawrays', function(vecArr){
+    // console.log("Bullet: x",vecArr[0],"y",vecArr[1],"z",vecArr[2]);
+    // console.log("Far Away Point: x",vecArr[3],"y",vecArr[4],"z",vecArr[5]);
+
+    // var pointA = new THREE.Vector3(vecArr[0],vecArr[1],vecArr[2]);
+    // var farAwayPoint = new THREE.Vector3(vecArr[0]+100,vecArr[1],vecArr[2]+100);
+    // var pointB = new THREE.Vector3();
+    // pointB.addVectors ( pointA, farAwayPoint.normalize().multiplyScalar(20) );
+    // drawRays(pointA, pointB);
+
+});
+
+function drawRays(pointA, pointB){
+         var geometry = new THREE.Geometry();
+         geometry.vertices.push( pointA );
+         geometry.vertices.push( pointB );
+         var material = new THREE.LineBasicMaterial( { color : 0xFF00FF } );
+         var intLT = new THREE.Line(geometry, material);
+         scene.add(intLT);
+         setTimeout(function(){scene.remove(intLT)}, 25);
+         setTimeout(function(){intLT.geometry.dispose();}, 25);
+}
+
+var raycaster = new THREE.Raycaster();
+
 function updateBullets(){
     for(var i = 0; i < liveBullets.length; i++){
-        liveBullets[i].position.z-=8*Math.cos(liveBullets[i].userData["yrotation"]);
-        liveBullets[i].position.x-=8*Math.sin(liveBullets[i].userData["yrotation"]);
-        liveBullets[i].userData["z"] -= 8*Math.cos(liveBullets[i].userData["yrotation"]);
-        liveBullets[i].userData["x"] -= 8*Math.sin(liveBullets[i].userData["yrotation"]);
+        for(var inc = 0; inc < 8; inc++){
+            liveBullets[i].position.z-=1*Math.cos(liveBullets[i].userData["yrotation"]);
+            liveBullets[i].position.x-=1*Math.sin(liveBullets[i].userData["yrotation"]);
+            liveBullets[i].userData["z"] -= 1*Math.cos(liveBullets[i].userData["yrotation"]);
+            liveBullets[i].userData["x"] -= 1*Math.sin(liveBullets[i].userData["yrotation"]);
+        }
+
+
+
         if(new Date().getTime() >= liveBullets[i].userData["deathTime"]){
             scene.remove(liveBullets[i]);
             liveBullets.shift();

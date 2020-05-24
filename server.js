@@ -23,6 +23,8 @@ var playercount = 0;
 
 var scene = new THREE.Scene();
 
+
+
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = {
@@ -40,11 +42,14 @@ io.on('connection', function(socket) {
     };
     playercount+=1;
 
-    playerMeshes[socket.id] = createPlayer(players[socket.id].color);
-    playerMeshesArr.push(playerMeshes[socket.id]);
-    scene.add(playerMeshes[socket.id]);
+    var newPlayer = createPlayer(players[socket.id].color);
+    newPlayer.name = socket.id;
+    playerMeshes[socket.id] = newPlayer;
+    playerMeshesArr.push(newPlayer);
+    scene.add(newPlayer);
     playerMeshes[socket.id].position.set(players[socket.id].x,players[socket.id].y,players[socket.id].z);
     playerMeshes[socket.id].rotation.y = players[socket.id].yrotation;
+
 
   });
 
@@ -79,7 +84,7 @@ io.on('connection', function(socket) {
         //visuals for physics
         var bullet = createBullet();
         bullet.userData = {deathTime: new Date().getTime()+2000, shotBy: player.id, x: player.x-3*Math.sin(player.yrotation), y: player.y, z:player.z-3*Math.cos(player.yrotation), yrotation: player.yrotation};
-
+        bullet.position.set(player.x-3*Math.sin(player.yrotation),player.y,player.z-3*Math.cos(player.yrotation));
         bullet.rotation.y = player.yrotation;
         scene.add(bullet);
         liveBullets.push(bullet);
@@ -184,54 +189,83 @@ function createBullet(){
     return bulletMesh;
 }
 
+
 var raycaster = new THREE.Raycaster();
+
 
 function updateBullets(){
     for(var i = 0; i < liveBullets.length; i++){
-        for(var j = 0; j < 8; j++){
+        for(var inc = 0; inc < 8; inc++){
             liveBullets[i].position.z-=1*Math.cos(liveBullets[i].userData["yrotation"]);
             liveBullets[i].position.x-=1*Math.sin(liveBullets[i].userData["yrotation"]);
             liveBullets[i].userData["z"] -= 1*Math.cos(liveBullets[i].userData["yrotation"]);
             liveBullets[i].userData["x"] -= 1*Math.sin(liveBullets[i].userData["yrotation"]);
-            for (var id in players) {
-                player = players[id];
-                if (player != {}){
-                    //check collision if not shot by same player
-                    if(player.id != liveBullets[i].userData["shotBy"] && player.isAlive){
 
-                        // var bulletVec = new THREE.Vector3();
-                        // bulletVec.x = liveBullets[i].userData["x"];
-                        // bulletVec.z = liveBullets[i].userData["z"];
-                        // bulletVec.y = liveBullets[i].userData["y"];
-                        //
-                        // var farAwayPoint = new THREE.Vector3();
-                        // farAwayPoint.x = liveBullets[i].userData["x"]-=100*Math.cos(liveBullets[i].userData["yrotation"]);
-                        // farAwayPoint.z = liveBullets[i].userData["z"]-=100*Math.sin(liveBullets[i].userData["yrotation"]);
-                        // farAwayPoint.y = liveBullets[i].userData["y"];
-                        // var intersects = []
-                        //
-                        // raycaster.set(bulletVec, farAwayPoint.normalize());
-                        // intersects = raycaster.intersectObjects(playerMeshesA);
-                        // if(intersects.length > 0){
-                        //     console.log("HIT");
-                        // }
+            var direction = new THREE.Vector3();
 
-                        if(Math.sqrt((liveBullets[i].userData["x"]-player.x)**2+(liveBullets[i].userData["y"]-player.y)**2+(liveBullets[i].userData["z"]-player.z)**2) < 9){
-                            player.isAlive = false;
-                            scene.remove(liveBullets[i]);
-                            player.deathTimer = 300;
-                        }
+            for(var z = 0; z < playerMeshesArr.length; z++){
+                playerMeshesArr[z].updateMatrixWorld();
+            }
+            var b = liveBullets[i];
+            raycaster.set(b.position, direction.subVectors(new THREE.Vector3(b.position.x-10*Math.sin(b.rotation.y),b.position.y,b.position.z-10*Math.cos(b.rotation.y)),b.position).normalize());
 
-                    }
+            intersects = raycaster.intersectObjects(playerMeshesArr);
+
+            if(intersects.length > 0){
+                hitPlayer = intersects[0];
+                if(hitPlayer.object.name != liveBullets[i].userData["shotBy"] && players[hitPlayer.object.name].isAlive && hitPlayer.distance <= 5){
+                    players[hitPlayer.object.name].isAlive = false;
+                    scene.remove(liveBullets[i]);
+                    player.deathTimer = 300;
+                    break;
                 }
+
+            }
+
+
+            if(new Date().getTime() >= liveBullets[i].userData["deathTime"]){
+                scene.remove(liveBullets[i]);
+                liveBullets.shift();
+                break;
             }
         }
 
-        if(new Date().getTime() >= liveBullets[i].userData["deathTime"]){
-            scene.remove(liveBullets[i]);
-            liveBullets.shift();
-        }
 
+        // for (var id in players) {
+        //     player = players[id];
+        //     if (player != {}){
+        //         //check collision if not shot by same player
+        //         if(player.id != liveBullets[i].userData["shotBy"] && player.isAlive){
+        //         }
+        //     }
+        // }
+
+        // var bbox = new THREE.BoxHelper(liveBullets[i], 0xff0000)
+        // var BBOX = new THREE.Box3().setFromObject(bbox);
+        //
+        // for(var z = 0; z < objects.length; z++){
+        //     var bbox2 = new THREE.BoxHelper(objects[z], 0xff0000)
+        //     var BBOX2 = new THREE.Box3().setFromObject(bbox2);
+        //
+        //     if(myIntersect(objects[z], liveBullets[i])){
+        //         console.log("HIT");
+        //     }
+        // }
 
     }
 }
+
+// function myIntersect(object1, object2){
+//     object1.geometry.computeBoundingBox();
+//     object2.geometry.computeBoundingBox();
+//     object1.updateMatrixWorld();
+//     object2.updateMatrixWorld();
+//
+//     var box1 = object1.geometry.boundingBox.clone();
+//     box1.applyMatrix4(object1.matrixWorld);
+//
+//     var box2 = object2.geometry.boundingBox.clone();
+//     box2.applyMatrix4(object2.matrixWorld);
+//
+//     return box1.intersectsBox(box2);
+// }
