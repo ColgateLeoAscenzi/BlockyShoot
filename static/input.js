@@ -7,40 +7,45 @@ var movement = {
 }
 
 document.addEventListener('keydown', function(event) {
-  switch (event.keyCode) {
-    case 65: // A
+    if(event.keyCode == 65){
       movement.left = true;
-      break;
-    case 87: // W
+    }
+    if(event.keyCode == 87){
       movement.up = true;
-      break;
-    case 68: // D
+    }
+    if(event.keyCode == 68){
       movement.right = true;
-      break;
-    case 83: // S
+    }
+    if(event.keyCode == 83){
       movement.down = true;
-      break;
-    case 32: //space
-      movement.space = true;
-      break;
-  }
+    }
+    if(event.keyCode == 32){
+        movement.space = true;
+    }
+    if(event.keyCode == 49 || event.keyCode == 97){
+        cameraMode = 1;
+    }
+    if(event.keyCode == 50 || event.keyCode == 98){
+        cameraMode = 2;
+    }
+    if(event.keyCode == 51 || event.keyCode == 99){
+        cameraMode = 3;
+    }
 });
 document.addEventListener('keyup', function(event) {
-  switch (event.keyCode) {
-    case 65: // A
+    if(event.keyCode == 65){
       movement.left = false;
-      break;
-    case 87: // W
+    }
+    if(event.keyCode == 87){
       movement.up = false;
-      break;
-    case 68: // D
+    }
+    if(event.keyCode == 68){
       movement.right = false;
-      break;
-    case 83: // S
+    }
+    if(event.keyCode == 83){
       movement.down = false;
-      break;
-    case 32: //space
+    }
+    if(event.keyCode == 32){
       movement.space = false;
-      break;
-  }
+    }
 });

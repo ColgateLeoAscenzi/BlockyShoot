@@ -20,6 +20,11 @@ var liveBullets = [];
 var lastPing = [];
 var ROLLAVG = 60;
 
+var firstLoad = true;
+var cameraMode = 1;
+
+var mode = "online";
+var character = "block";
 
 createCanvas();
 
@@ -84,21 +89,6 @@ function handleWindowResize() {
 //       requestAnimationFrame(loop);
 // }
 
-function createPlayer(color){
-    var playerBoxGeom = new THREE.BoxGeometry(10,10,10,1,1,1);
-    var playerBoxMat  = new THREE.MeshPhongMaterial({color : color});
-    var playerBoxMesh = new THREE.Mesh(playerBoxGeom, playerBoxMat);
-    return playerBoxMesh;
-    // scene.add(playerBoxMesh);
-}
-
-function createBullet(){
-    var bulletGeom = new THREE.BoxGeometry(10,2,2,1,1,1);
-    var bulletMat = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
-    var bulletMesh = new THREE.Mesh(bulletGeom, bulletMat);
-    return bulletMesh;
-}
-
 function createScene(){
     scene = new THREE.Scene();
 
@@ -118,16 +108,52 @@ function createScene(){
     var ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
 
+    // var light = new THREE.PointLight( 0x00ffff, 1, 100 );
+    // light.position.set( -5, 20, -5 );
+    // scene.add( light );
 }
 
 
 socket.on('state', function(players) {
+    if(firstLoad){
+        // mode = prompt("What Mode? Model, Online", "Online");
+
+        // if (mode == null || mode == "" || mode == "online" || mode == "ONLINE" || mode == "Online") {
+          // mode = "online";
+        // } else {
+          // mode = "model"
+        // }
+
+        //console.log("Starting mode",mode);
+        // char = prompt("What character? (Piplup, Vaporeon, Block)", "block");
+        //
+        // if (char == null || char == "" || char == "block" || char == "BLOCK" || char == "Block") {
+        //   character = "block";
+        // } else if(char == "PIPLUP" || char == "Piplup" || char == "piplup"){
+        //   character = "piplup"
+        // }
+        // else if(char == "VAPOREON" || char == "Vaporeon" || char == "vaporeon"){
+        //     character = "vaporeon"
+        // }
+        firstLoad = false;
+    }
+
   for (var id in players) {
     var player = players[id];
     if (player != {}){
         if(playerMeshes[id] == undefined){
-            playerMeshes[id] = createPlayer(player.color);
-            scene.add(playerMeshes[id]);
+            // if(character == "piplup"){
+            //     playerMeshes[id] = createPiplup();
+            //     scene.add(playerMeshes[id]);
+            // }
+            // else if(character == "vaporeon"){
+            //     playerMeshes[id] = createVaporeon();
+            //     scene.add(playerMeshes[id]);
+            // }
+            // else{
+                playerMeshes[id] = createVaporeon(player.color);
+                scene.add(playerMeshes[id]);
+            // }
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
         playerMeshes[id].rotation.y = player.yrotation;
@@ -138,7 +164,7 @@ socket.on('state', function(players) {
         else{
             playerMeshes[id].scale.set(1,1,1);
         }
-
+        // playerMeshes[id].body.head.horn.rotation.x+=0.01;
         if(socket.id == id){
             if(!player.isAlive){
                 document.getElementById("respawn").innerHTML = "You Died, Respawn in<br>"+Math.round((player.deathTimer*(1000/60))/1000)+" s";
@@ -146,10 +172,27 @@ socket.on('state', function(players) {
             else{
                 document.getElementById("respawn").innerHTML = "";
             }
-            camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
-            camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
-            // camera.position.set(player.x,player.y+500,player.z);
-            // camera.lookAt(player.x,player.y,player.z);
+            if(mode == "online"){
+                camera.position.set(player.x+50*Math.sin(player.yrotation),player.y+30,player.z+50*Math.cos(player.yrotation));
+                camera.lookAt(player.x-10*Math.sin(player.yrotation),player.y,player.z-10*Math.cos(player.yrotation));
+            }
+            else{
+                if(cameraMode == 1){
+                    camera.position.set(player.x,player.y+80,player.z);
+                    camera.lookAt(player.x,player.y,player.z);
+                }
+                else if(cameraMode == 2){
+                    camera.position.set(player.x,player.y+40,player.z+50);
+                    camera.lookAt(player.x,player.y,player.z-10);
+                }
+                else{
+                    camera.position.set(player.x,2,player.z+50);
+                    camera.lookAt(player.x,2,player.z-10);
+                }
+
+            }
+
+
             playerMeshes[id].rotation.y = player.yrotation;
         }
     }

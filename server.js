@@ -20,6 +20,7 @@ var playerMeshes = {};
 var playerMeshesArr = [];
 var liveBullets = [];
 var playercount = 0;
+var cameraAbove = false;
 
 var scene = new THREE.Scene();
 
@@ -49,7 +50,6 @@ io.on('connection', function(socket) {
     scene.add(newPlayer);
     playerMeshes[socket.id].position.set(players[socket.id].x,players[socket.id].y,players[socket.id].z);
     playerMeshes[socket.id].rotation.y = players[socket.id].yrotation;
-
 
   });
 
@@ -183,10 +183,20 @@ function createPlayer(color){
 }
 
 function createBullet(){
-    var bulletGeom = new THREE.BoxGeometry(2,2,10,1,1,1);
-    var bulletMat = new THREE.MeshPhongMaterial({color: 0xAA0000});
+    var bullet = new THREE.Object3D();
+    var bulletGeom = new THREE.BoxGeometry(2,2,4,1,1,1);
+    var bulletMat = new THREE.MeshPhongMaterial({color: 0x0101AA});
     var bulletMesh = new THREE.Mesh(bulletGeom, bulletMat);
-    return bulletMesh;
+    var bulletFrontGeom = new THREE.BoxBufferGeometry(2,2,2);
+    var bulletFrontMat = new THREE.MeshPhongMaterial({color: 0x73cfea});
+    var bulletFrontMesh = new THREE.Mesh(bulletFrontGeom,bulletFrontMat);
+    bulletMesh.add(bulletFrontMesh);
+
+    bullet.add(bulletMesh);
+    bullet.add(bulletFrontMesh);
+    bulletFrontMesh.position.set(0,10,10);
+
+    return bullet;
 }
 
 
