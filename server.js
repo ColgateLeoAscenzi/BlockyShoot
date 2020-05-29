@@ -27,7 +27,7 @@ var scene = new THREE.Scene();
 
 
 io.on('connection', function(socket) {
-  socket.on('new player', function() {
+  socket.on('new player', function(info) {
     players[socket.id] = {
       id: playercount,
       x: -20+Math.random()*20,
@@ -40,6 +40,7 @@ io.on('connection', function(socket) {
       shootCooldown: 15,
       isAlive: true,
       deathTimer: 300,
+      character: info.selected,
     };
     playercount+=1;
 
@@ -183,20 +184,28 @@ function createPlayer(color){
 }
 
 function createBullet(){
-    var bullet = new THREE.Object3D();
+    this.mesh      = new THREE.Object3D();
+    this.mesh.name = "Bullet";
+
+    this.mesh.bullet = new THREE.Object3D();
+    this.mesh.bullet.name = "Body";
     var bulletGeom = new THREE.BoxGeometry(2,2,4,1,1,1);
     var bulletMat = new THREE.MeshPhongMaterial({color: 0x0101AA});
     var bulletMesh = new THREE.Mesh(bulletGeom, bulletMat);
-    var bulletFrontGeom = new THREE.BoxBufferGeometry(2,2,2);
+    this.mesh.bullet.add(bulletMesh);
+
+    this.mesh.bullet.front = new THREE.Object3D();
+    this.mesh.bullet.front.name = "Front";
+    var bulletFrontGeom = new THREE.BoxBufferGeometry(3,3,2);
     var bulletFrontMat = new THREE.MeshPhongMaterial({color: 0x73cfea});
     var bulletFrontMesh = new THREE.Mesh(bulletFrontGeom,bulletFrontMat);
-    bulletMesh.add(bulletFrontMesh);
+    this.mesh.bullet.front.add(bulletFrontMesh);
+    this.mesh.bullet.add(this.mesh.bullet.front);
+    this.mesh.add(this.mesh.bullet);
+    this.mesh.bullet.front.position.set(0,0,-3);
+    this.mesh.bullet.front.userData = {position: {x:0,y:0,z:-3}};
 
-    bullet.add(bulletMesh);
-    bullet.add(bulletFrontMesh);
-    bulletFrontMesh.position.set(0,10,10);
-
-    return bullet;
+    return this.mesh;
 }
 
 

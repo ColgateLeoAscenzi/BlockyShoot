@@ -19,12 +19,41 @@ function createVaporeon(){
     this.mesh.body.position.y-=3;
 
     this.mesh.body.head = new THREE.Object3D();
-    var headGeom = new THREE.BoxBufferGeometry(6,6,6,1,1,1);
-    var headMat  = new THREE.MeshPhongMaterial({color : vaporeonColors.headTop});
+    var headGeom = new THREE.BoxBufferGeometry(5,5,5,1,1,1);
+    var headMat  = new THREE.MeshPhongMaterial({color : vaporeonColors.main});
     var headMesh = new THREE.Mesh(headGeom, headMat);
-    this.mesh.body.head.position.set(0,5,-4);
+    this.mesh.body.head.position.set(0,5,-3);
     this.mesh.body.head.add(headMesh);
     this.mesh.body.add(this.mesh.body.head);
+
+    this.mesh.body.head.hat = new THREE.Object3D();
+    this.mesh.body.head.hat1 = new THREE.Object3D();
+    this.mesh.body.head.hat1.add(new THREE.Mesh(new THREE.BoxBufferGeometry(7,1,5,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat1);
+    this.mesh.body.head.hat1.position.set(0,3,0);
+    this.mesh.body.head.hat2 = new THREE.Object3D();
+    this.mesh.body.head.hat2.add(new THREE.Mesh(new THREE.BoxBufferGeometry(5,5,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat2);
+    this.mesh.body.head.hat2.position.set(0,0,3);
+    this.mesh.body.head.hat3 = new THREE.Object3D();
+    this.mesh.body.head.hat3.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,5,4,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat3);
+    this.mesh.body.head.hat3.position.set(3,0,1.5);
+    this.mesh.body.head.hat4 = new THREE.Object3D();
+    this.mesh.body.head.hat4.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,5,2,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.main})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat4);
+    this.mesh.body.head.hat4.position.set(3,0,-1.5);
+    this.mesh.body.head.hat5 = new THREE.Object3D();
+    this.mesh.body.head.hat5.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,5,4,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat5);
+    this.mesh.body.head.hat5.position.set(-3,0,1.5);
+    this.mesh.body.head.hat6 = new THREE.Object3D();
+    this.mesh.body.head.hat6.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,5,2,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.main})))
+    this.mesh.body.head.hat.add(this.mesh.body.head.hat6);
+    this.mesh.body.head.hat6.position.set(-3,0,-1.5);
+
+    this.mesh.body.head.add(this.mesh.body.head.hat);
+
 
     this.mesh.body.head.leftEye = new THREE.Object3D();
     var eyeG = new THREE.BoxBufferGeometry(1,2,1,1,1,1);
@@ -75,6 +104,53 @@ function createVaporeon(){
 
     this.mesh.body.head.add(this.mesh.body.head.horn);
 
+    this.mesh.body.head.rightHorn = new THREE.Object3D();
+    this.mesh.body.head.rightHorn1 = new THREE.Object3D();
+    this.mesh.body.head.rightHorn1.add(new THREE.Mesh(new THREE.BoxBufferGeometry(6,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.ears})))
+    this.mesh.body.head.rightHorn.add(this.mesh.body.head.rightHorn1);
+    this.mesh.body.head.rightHorn1.position.set(6,0,0);
+    this.mesh.body.head.rightHorn2 = new THREE.Object3D();
+    this.mesh.body.head.rightHorn2.add(new THREE.Mesh(new THREE.BoxBufferGeometry(4,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.ears})))
+    this.mesh.body.head.rightHorn.add(this.mesh.body.head.rightHorn2);
+    this.mesh.body.head.rightHorn2.position.set(5,-1,0);
+    this.mesh.body.head.rightHorn3 = new THREE.Object3D();
+    this.mesh.body.head.rightHorn3.add(new THREE.Mesh(new THREE.BoxBufferGeometry(5.5,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.rightHorn.add(this.mesh.body.head.rightHorn3);
+    this.mesh.body.head.rightHorn3.position.set(5.5,1,0);
+    this.mesh.body.head.rightHorn4 = new THREE.Object3D();
+    this.mesh.body.head.rightHorn4.add(new THREE.Mesh(new THREE.BoxBufferGeometry(5,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.rightHorn.add(this.mesh.body.head.rightHorn4);
+    this.mesh.body.head.rightHorn4.position.set(5,2,0);
+
+    this.mesh.body.head.add(this.mesh.body.head.rightHorn);
+    this.mesh.body.head.rightHorn.rotation.set(0.4,0,0.3);
+    this.mesh.body.head.rightHorn.position.set(0,-.5,-2);
+
+
+    this.mesh.body.head.leftHorn = new THREE.Object3D();
+    this.mesh.body.head.leftHorn1 = new THREE.Object3D();
+    this.mesh.body.head.leftHorn1.add(new THREE.Mesh(new THREE.BoxBufferGeometry(6,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.ears})))
+    this.mesh.body.head.leftHorn.add(this.mesh.body.head.leftHorn1);
+    this.mesh.body.head.leftHorn1.position.set(-6,0,0);
+    this.mesh.body.head.leftHorn2 = new THREE.Object3D();
+    this.mesh.body.head.leftHorn2.add(new THREE.Mesh(new THREE.BoxBufferGeometry(4,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.ears})))
+    this.mesh.body.head.leftHorn.add(this.mesh.body.head.leftHorn2);
+    this.mesh.body.head.leftHorn2.position.set(-5,-1,0);
+    this.mesh.body.head.leftHorn3 = new THREE.Object3D();
+    this.mesh.body.head.leftHorn3.add(new THREE.Mesh(new THREE.BoxBufferGeometry(5.5,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.leftHorn.add(this.mesh.body.head.leftHorn3);
+    this.mesh.body.head.leftHorn3.position.set(-5.5,1,0);
+    this.mesh.body.head.leftHorn4 = new THREE.Object3D();
+    this.mesh.body.head.leftHorn4.add(new THREE.Mesh(new THREE.BoxBufferGeometry(5,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.head.leftHorn.add(this.mesh.body.head.leftHorn4);
+    this.mesh.body.head.leftHorn4.position.set(-5,2,0);
+
+    this.mesh.body.head.add(this.mesh.body.head.leftHorn);
+    this.mesh.body.head.leftHorn.rotation.set(0.4,0,-0.3);
+    this.mesh.body.head.leftHorn.position.set(0,-.5,-2);
+
+
+
     this.mesh.body.ring = new THREE.Object3D();
     var ringGeom = new THREE.ConeBufferGeometry(5.5,1,10);
     var ringMat = new THREE.MeshPhongMaterial({color: vaporeonColors.ring});
@@ -112,6 +188,26 @@ function createVaporeon(){
     this.mesh.body.tail.add(tailMesh);
     this.mesh.body.add(this.mesh.body.tail);
     this.mesh.body.tail.position.set(0,-0.5,5.5);
+
+    this.mesh.body.tail.spike1 = new THREE.Object3D();
+    this.mesh.body.tail.spike1.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.tail.add(this.mesh.body.tail.spike1);
+    this.mesh.body.tail.spike1.position.set(0,2,0);
+
+    this.mesh.body.tail.spike2 = new THREE.Object3D();
+    this.mesh.body.tail.spike2.add(new THREE.Mesh(new THREE.BoxBufferGeometry(0.75,0.75,0.75,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.tail.add(this.mesh.body.tail.spike2);
+    this.mesh.body.tail.spike2.position.set(0,1.75,1.25);
+
+    this.mesh.body.tail.spike3 = new THREE.Object3D();
+    this.mesh.body.tail.spike3.add(new THREE.Mesh(new THREE.BoxBufferGeometry(0.75,0.75,0.75,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.tail.add(this.mesh.body.tail.spike3);
+    this.mesh.body.tail.spike3.position.set(0,1.75,-1.25);
+
+    this.mesh.body.spike = new THREE.Object3D();
+    this.mesh.body.spike.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1,1,1,1), new THREE.MeshPhongMaterial({color:vaporeonColors.headTop})))
+    this.mesh.body.add(this.mesh.body.spike);
+    this.mesh.body.spike.position.set(0,2.25,3.25);
 
     this.mesh.body.tail.leftFin = new THREE.Object3D();
     var finGeom = new THREE.BoxBufferGeometry(3.25,0.66,2,1,1,1);

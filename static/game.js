@@ -3,9 +3,21 @@ const socket = io();
 // socket.on('message', function(data){
 //     console.log(data);
 // });
+var character = "block";
 
+char = prompt("What character? (Piplup, Vaporeon, Block)", "block");
+//
+if (char == null || char == "" || char == "block" || char == "BLOCK" || char == "Block") {
+  character = "block";
+} else if(char == "PIPLUP" || char == "Piplup" || char == "piplup"){
+  character = "piplup"
+}
+else if(char == "VAPOREON" || char == "Vaporeon" || char == "vaporeon"){
+    character = "vaporeon"
+}
 
-socket.emit('new player');
+socket.emit('new player', {selected: character});
+
 var camera, fieldOfView, aspectRatio, nearPlane, farPlane,
     renderer, container, scene;
 
@@ -24,7 +36,6 @@ var firstLoad = true;
 var cameraMode = 1;
 
 var mode = "online";
-var character = "block";
 
 createCanvas();
 
@@ -115,29 +126,6 @@ function createScene(){
 
 
 socket.on('state', function(players) {
-    if(firstLoad){
-        // mode = prompt("What Mode? Model, Online", "Online");
-
-        // if (mode == null || mode == "" || mode == "online" || mode == "ONLINE" || mode == "Online") {
-          // mode = "online";
-        // } else {
-          // mode = "model"
-        // }
-
-        //console.log("Starting mode",mode);
-        // char = prompt("What character? (Piplup, Vaporeon, Block)", "block");
-        //
-        // if (char == null || char == "" || char == "block" || char == "BLOCK" || char == "Block") {
-        //   character = "block";
-        // } else if(char == "PIPLUP" || char == "Piplup" || char == "piplup"){
-        //   character = "piplup"
-        // }
-        // else if(char == "VAPOREON" || char == "Vaporeon" || char == "vaporeon"){
-        //     character = "vaporeon"
-        // }
-        firstLoad = false;
-    }
-
   for (var id in players) {
     var player = players[id];
     if (player != {}){
@@ -151,8 +139,19 @@ socket.on('state', function(players) {
             //     scene.add(playerMeshes[id]);
             // }
             // else{
-                playerMeshes[id] = createVaporeon(player.color);
+            if(player.character == "vaporeon"){
+                playerMeshes[id] = createVaporeon();
                 scene.add(playerMeshes[id]);
+            }
+            else if(player.character == "piplup"){
+                playerMeshes[id] = createPiplup();
+                scene.add(playerMeshes[id]);
+            }
+            else{
+                playerMeshes[id] = createPlayer(player.color);
+                scene.add(playerMeshes[id]);
+            }
+
             // }
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
@@ -209,6 +208,9 @@ socket.on('shot', function(bullet){
         scene.add(obj);
         obj.position.set(obj.userData["x"],obj.userData["y"],obj.userData["z"]);
         obj.rotation.y = obj.userData["yrotation"];
+        obj.children[0].children[1].position.set(obj.children[0].children[1].userData.position["x"],
+                                                obj.children[0].children[1].userData.position["y"],
+                                                obj.children[0].children[1].userData.position["z"]);
     } );
 });
 
