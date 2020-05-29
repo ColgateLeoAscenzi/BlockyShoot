@@ -1,2 +1,2 @@
 # BlockyShoot
-Just a test to see if I can get socket.io and THREE.Js to work well together.
+Go to http://blocky-shoot.herokuapp.com to test out the multiplayer functionality.
