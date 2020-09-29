@@ -17,7 +17,6 @@ else if(char == "VAPOREON" || char == "Vaporeon" || char == "vaporeon"){
 }
 
 socket.emit('new player', {selected: character});
-
 var camera, fieldOfView, aspectRatio, nearPlane, farPlane,
     renderer, container, scene;
 
@@ -124,35 +123,31 @@ function createScene(){
     // scene.add( light );
 }
 
+//remove the playermesh for people who don't exist
+socket.on('dcplayer', function(removedPlayer){
+  console.log("removing dc'd player", removedPlayer);
+  scene.remove(playerMeshes[removedPlayer]);
+  delete playerMeshes[removedPlayer];
+});
+
+// setInterval(function(){console.log(playerMeshes)}, 2000);
 
 socket.on('state', function(players) {
   for (var id in players) {
     var player = players[id];
     if (player != {}){
         if(playerMeshes[id] == undefined){
-            // if(character == "piplup"){
-            //     playerMeshes[id] = createPiplup();
-            //     scene.add(playerMeshes[id]);
-            // }
-            // else if(character == "vaporeon"){
-            //     playerMeshes[id] = createVaporeon();
-            //     scene.add(playerMeshes[id]);
-            // }
-            // else{
+          //create placeholder if undefined. Later the model will load in
+            playerMeshes[id] = new THREE.Mesh(new THREE.BoxGeometry(1,1,1,1,1,1), new THREE.MeshBasicMaterial({color : 0x000000}));
             if(player.character == "vaporeon"){
-                playerMeshes[id] = createVaporeon();
-                scene.add(playerMeshes[id]);
+                createVaporeon(id);
             }
             else if(player.character == "piplup"){
-                playerMeshes[id] = createPiplup();
-                scene.add(playerMeshes[id]);
+                createPiplup(id);
             }
             else{
-                playerMeshes[id] = createPlayer(player.color);
-                scene.add(playerMeshes[id]);
+                createPlayer(id,player.color);
             }
-
-            // }
         }
         playerMeshes[id].position.set(player.x,player.y,player.z);
         playerMeshes[id].rotation.y = player.yrotation;

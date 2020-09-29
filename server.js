@@ -125,13 +125,25 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-      players[socket.id] = {};
+    io.sockets.emit("dcplayer", socket.id);
+    scene.remove(playerMeshes[socket.id]);
+    var foundIdx = -1;
+    for(var i = 0; i < playerMeshesArr.length; i++){
+      if(playerMeshesArr[i].name == socket.id){
+        foundIdx = i;
+        break;
+      }
+    }
+    playerMeshesArr.splice(i, 1);
+    delete playerMeshesArr[socket.id];
+    delete playerMeshes[socket.id];
+    delete players[socket.id];
  });
 });
 
 setInterval(function() {
   for (var id in players) {
-      player = players[id];
+      var player = players[id];
       if (player != {}){
           if(playerMeshes[id] == undefined){
               if(player.color == undefined){
@@ -152,7 +164,7 @@ setInterval(function() {
   io.sockets.emit('state', players);
 
   for (var id in players) {
-      player = players[id];
+      var player = players[id];
       if (player != {}){
           if(!player.isAlive){
               player.deathTimer--;
@@ -169,9 +181,6 @@ setInterval(function() {
 }, 1000 / 60);
 
 setInterval(function(){updateBullets();}, 1000/60);
-
-
-
 
 
 //threeD stuff
@@ -232,13 +241,12 @@ function updateBullets(){
 
             if(intersects.length > 0){
                 hitPlayer = intersects[0];
-                if(hitPlayer.object.name != liveBullets[i].userData["shotBy"] && players[hitPlayer.object.name].isAlive && hitPlayer.distance <= 5){
-                    players[hitPlayer.object.name].isAlive = false;
-                    scene.remove(liveBullets[i]);
-                    players[hitPlayer.object.name].deathTimer = 300;
-                    break;
-                }
-
+                  if(hitPlayer.object.name != liveBullets[i].userData["shotBy"] && players[hitPlayer.object.name].isAlive && hitPlayer.distance <= 5){
+                      players[hitPlayer.object.name].isAlive = false;
+                      scene.remove(liveBullets[i]);
+                      players[hitPlayer.object.name].deathTimer = 300;
+                      break;
+                  }
             }
 
 
