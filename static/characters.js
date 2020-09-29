@@ -5,6 +5,7 @@ var vaporeonColors = {
     ring: 0xe9f6ff,
     eye: 0x000000,
 }
+var GLLoader = new THREE.GLTFLoader();
 
 function createVaporeon(){
     this.mesh      = new THREE.Object3D();
