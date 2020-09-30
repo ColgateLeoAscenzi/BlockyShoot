@@ -156,7 +156,7 @@ socket.on('state', function(players) {
             playerMeshes[id].scale.set((Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10));
         }
         else{
-            playerMeshes[id].scale.set(1,1,1);
+          playerMeshes[id].scale.set(1,1,1);
         }
         // playerMeshes[id].body.head.horn.rotation.x+=0.01;
         if(socket.id == id){

@@ -13,8 +13,9 @@ function createVaporeon(id){
 
 const onLoad = ( gltf, id ) => {
   var mesh = gltf.scene.children[0];
-  mesh.material = new THREE.MeshPhongMaterial({color: 0xffffff});
-  mesh.up = new THREE.Vector3(0,0,1);
+  // console.log(gltf.scene.children[0]);
+  // mesh.material = new THREE.MeshPhongMaterial({color: 0xffffff});
+  // mesh.up = new THREE.Vector3(0,0,1);
   scene.add(mesh);
   playerMeshes[id] = mesh;
   console.log('done loading');

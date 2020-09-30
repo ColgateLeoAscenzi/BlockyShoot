@@ -43,7 +43,6 @@ io.on('connection', function(socket) {
       character: info.selected,
     };
     playercount+=1;
-
     var newPlayer = createPlayer(players[socket.id].color);
     newPlayer.name = socket.id;
     playerMeshes[socket.id] = newPlayer;
@@ -181,6 +180,7 @@ setInterval(function() {
 }, 1000 / 60);
 
 setInterval(function(){updateBullets();}, 1000/60);
+
 
 
 //threeD stuff
