@@ -160,7 +160,9 @@ socket.on('state', function(players) {
           if(vaporeonLoaded &&!vaporeonDone){
             vaporeonMixer = new THREE.AnimationMixer(playerMeshes[id]);
             vaporeonDone = true;
+            console.log(vaporeonAnimations);
             vaporeonAnimationClips.walk = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001"));
+            vaporeonAnimationClips.idle = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Idle"));
           }
           else if(vaporeonLoaded && vaporeonDone){
             vaporeonMixer.update(delta);
@@ -173,12 +175,25 @@ socket.on('state', function(players) {
 
         //handle animations
         if(player.character == "vaporeon" && vaporeonDone){
+          //idle
+          if((player.isWalking || player.isAttack1 || player.isAttack2 || player.isJumping) && (vaporeonAnimationClips.idle.isRunning())){
+            vaporeonAnimationClips.idle.halt(0.2).stop();
+          }
+          if(!player.isWalking && !player.isAttack1 && !player.isAttack2 && !player.isJumping && !vaporeonAnimationClips.idle.isRunning()){
+            vaporeonAnimationClips.idle.play();
+          }
+
+          //walking
           if(player.isWalking && !vaporeonAnimationClips.walk.isRunning()){
             vaporeonAnimationClips.walk.play();
           }
           if(!player.isWalking && vaporeonAnimationClips.walk.isRunning()){
-            vaporeonAnimationClips.walk.halt(0.1).reset();
+            vaporeonAnimationClips.walk.halt(0.2).stop();
           }
+
+          //attack 1
+
+
         }
 
 
