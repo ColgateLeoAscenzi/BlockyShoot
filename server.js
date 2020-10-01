@@ -38,6 +38,8 @@ io.on('connection', function(socket) {
       yrotation: 0,
       canShoot: true,
       shootCooldown: 15,
+      isShooting: false,
+      shootDelay: 50,
       isAlive: true,
       deathTimer: 300,
       character: info.selected,
@@ -60,50 +62,48 @@ io.on('connection', function(socket) {
 
   socket.on('movement', function(data) {
     var player = players[socket.id] || {};
+
+    if(player.isAttack1){
+      player.isAttack1 = false;
+    }
     //console.log(player);
     if (data.left && player.isAlive) {
-        player.yrotation+=0.05;
+        player.yrotation+=0.03;
     }
     if (data.down && player.isAlive) {
         player.isWalking = true;
         player.isIdle = false;
-        if(player.velocity + 0.25 < 2){
-            player.velocity += 0.25;
+        if(player.velocity + 0.15 < 1){
+            player.velocity += 0.15;
         }
         else{
-            player.velocity = 2;
+            player.velocity = 1;
         }
     }
 
     if (data.right && player.isAlive) {
       player.isIdle = false;
-        player.yrotation-=0.05;
+        player.yrotation-=0.03;
 
     }
     if (data.up && player.isAlive) {
       player.isIdle = false;
         player.isWalking = true;
-        if(player.velocity - 0.25 > -2){
-            player.velocity -= 0.25;
+        if(player.velocity - 0.15 > -1){
+            player.velocity -= 0.15;
         }
         else{
-            player.velocity = - 2;
+            player.velocity = - 1;
         }
     }
     if (data.space && player.canShoot && player.isAlive){
-      player.isIdle = false;
-        //visuals for physics
-        var bullet = createBullet();
-        bullet.userData = {deathTime: new Date().getTime()+2000, shotBy: player.id, x: player.x-3*Math.sin(player.yrotation), y: player.y, z:player.z-3*Math.cos(player.yrotation), yrotation: player.yrotation};
-        bullet.position.set(player.x-3*Math.sin(player.yrotation),player.y,player.z-3*Math.cos(player.yrotation));
-        bullet.rotation.y = player.yrotation;
-        scene.add(bullet);
-        liveBullets.push(bullet);
-        io.sockets.emit('shot',bullet);
-        //reset shooting
-        player.canShoot = false;
+        player.isIdle = false;
 
+        player.isShooting = true;
+        player.canShoot = false;
+        player.isAttack1 = true;
     }
+
     if(!data.down && !data.up && player.isAlive){
       player.isIdle = false;
         //kill momentum
@@ -122,7 +122,23 @@ io.on('connection', function(socket) {
         player.z = -180;
     }
 
-    if(!player.canShoot){
+    if(player.isShooting){
+      player.shootDelay--;
+      if(player.shootDelay <=0){
+        //after delaying the actual bullet, from the initial button press, then shoot for rea.
+        var bullet = createBullet();
+        bullet.userData = {deathTime: new Date().getTime()+2000, shotBy: player.id, x: player.x-3*Math.sin(player.yrotation), y: player.y, z:player.z-3*Math.cos(player.yrotation), yrotation: player.yrotation};
+        bullet.position.set(player.x-3*Math.sin(player.yrotation),player.y,player.z-3*Math.cos(player.yrotation));
+        bullet.rotation.y = player.yrotation;
+        scene.add(bullet);
+        liveBullets.push(bullet);
+        io.sockets.emit('shot',bullet);
+        player.shootDelay = 50;
+        player.isShooting = false;
+      }
+    }
+
+    if(!player.canShoot && !player.isShooting){
         player.shootCooldown--;
         if(player.shootCooldown <=0){
             player.shootCooldown = 15;

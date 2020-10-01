@@ -22,7 +22,7 @@ socket.emit('new player', {selected: character});
 var vaporeonMixer;
 var vaporeonLoaded = false;
 var vaporeonDone = false;
-var vaporeonAnimationClips = {idle: undefined, walk: undefined, attack1: undefined};
+var vapAnimCl = {idle: undefined, walk: undefined, attack1: undefined};
 
 var camera, fieldOfView, aspectRatio, nearPlane, farPlane,
     renderer, container, scene;
@@ -163,12 +163,14 @@ socket.on('state', function(players) {
             vaporeonMixer = new THREE.AnimationMixer(playerMeshes[id]);
             vaporeonDone = true;
             console.log(vaporeonAnimations);
-            vaporeonAnimationClips.walk = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001"));
-            vaporeonAnimationClips.idle = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Idle"));
-            currentAction = vaporeonAnimationClips.idle;
-            lastAction = vaporeonAnimationClips.idle;
-            vaporeonAnimationClips.idle.play();
-            vaporeonAnimationClips.walk.play().fadeOut(0.001);
+            vapAnimCl.walk = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Walk"));
+            vapAnimCl.idle = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Idle"));
+            vapAnimCl.attack1 = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Attack1"));
+            vapAnimCl.attack1.setLoop(THREE.LoopOnce);
+            currentAction = vapAnimCl.idle;
+            lastAction = vapAnimCl.idle;
+            vapAnimCl.idle.play();
+            vapAnimCl.walk.play().fadeOut(0.001);
           }
           else if(vaporeonLoaded && vaporeonDone){
             vaporeonMixer.update(delta);
@@ -180,13 +182,17 @@ socket.on('state', function(players) {
 
         //handle animations
         if(player.character == "vaporeon" && vaporeonDone){
-          if(currentAction == vaporeonAnimationClips.idle && player.isWalking){
-            switchAction(vaporeonAnimationClips.walk);
+          if(currentAction == vapAnimCl.idle && player.isWalking){
+            switchAction(vapAnimCl.walk);
           }
-          else if(currentAction == vaporeonAnimationClips.walk && player.isIdle){
-            switchAction(vaporeonAnimationClips.idle);
+          else if(currentAction == vapAnimCl.walk && player.isIdle){
+            switchAction(vapAnimCl.idle);
           }
-          
+
+          if(player.isAttack1){
+            vapAnimCl.attack1.play().reset();
+          }
+
         }
 
 
