@@ -41,6 +41,7 @@ io.on('connection', function(socket) {
       isAlive: true,
       deathTimer: 300,
       character: info.selected,
+      isIdle: true,
       isWalking: false,
       isJumping: false,
       isAttack1: false,
@@ -65,6 +66,7 @@ io.on('connection', function(socket) {
     }
     if (data.down && player.isAlive) {
         player.isWalking = true;
+        player.isIdle = false;
         if(player.velocity + 0.25 < 2){
             player.velocity += 0.25;
         }
@@ -74,10 +76,12 @@ io.on('connection', function(socket) {
     }
 
     if (data.right && player.isAlive) {
+      player.isIdle = false;
         player.yrotation-=0.05;
 
     }
     if (data.up && player.isAlive) {
+      player.isIdle = false;
         player.isWalking = true;
         if(player.velocity - 0.25 > -2){
             player.velocity -= 0.25;
@@ -87,6 +91,7 @@ io.on('connection', function(socket) {
         }
     }
     if (data.space && player.canShoot && player.isAlive){
+      player.isIdle = false;
         //visuals for physics
         var bullet = createBullet();
         bullet.userData = {deathTime: new Date().getTime()+2000, shotBy: player.id, x: player.x-3*Math.sin(player.yrotation), y: player.y, z:player.z-3*Math.cos(player.yrotation), yrotation: player.yrotation};
@@ -100,6 +105,7 @@ io.on('connection', function(socket) {
 
     }
     if(!data.down && !data.up && player.isAlive){
+      player.isIdle = false;
         //kill momentum
         player.velocity = player.velocity*0.88;
     }
@@ -132,6 +138,9 @@ io.on('connection', function(socket) {
     //handle animations
     if(Math.abs(player.velocity) < 0.01){
       player.isWalking = false;
+    }
+    if(player.isWalking == false && player.isAttack1 == false && player.isAttack2 == false && player.isJumping == false){
+      player.isIdle = true;
     }
   });
 

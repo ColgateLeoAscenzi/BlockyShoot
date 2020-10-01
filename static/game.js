@@ -135,6 +135,8 @@ socket.on('dcplayer', function(removedPlayer){
 var clock = new THREE.Clock();
 clock.start();
 var delta;
+var currentAction;
+var lastAction;
 
 socket.on('state', function(players) {
   delta = clock.getDelta();
@@ -163,6 +165,10 @@ socket.on('state', function(players) {
             console.log(vaporeonAnimations);
             vaporeonAnimationClips.walk = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001"));
             vaporeonAnimationClips.idle = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Idle"));
+            currentAction = vaporeonAnimationClips.idle;
+            lastAction = vaporeonAnimationClips.idle;
+            vaporeonAnimationClips.idle.play();
+            vaporeonAnimationClips.walk.play().fadeOut(0.001);
           }
           else if(vaporeonLoaded && vaporeonDone){
             vaporeonMixer.update(delta);
@@ -172,28 +178,15 @@ socket.on('state', function(players) {
         playerMeshes[id].position.set(player.x,5,player.z);
         playerMeshes[id].rotation.y = player.yrotation;
 
-
         //handle animations
         if(player.character == "vaporeon" && vaporeonDone){
-          //idle
-          if((player.isWalking || player.isAttack1 || player.isAttack2 || player.isJumping) && (vaporeonAnimationClips.idle.isRunning())){
-            vaporeonAnimationClips.idle.halt(0.2).stop();
+          if(currentAction == vaporeonAnimationClips.idle && player.isWalking){
+            switchAction(vaporeonAnimationClips.walk);
           }
-          if(!player.isWalking && !player.isAttack1 && !player.isAttack2 && !player.isJumping && !vaporeonAnimationClips.idle.isRunning()){
-            vaporeonAnimationClips.idle.play();
+          else if(currentAction == vaporeonAnimationClips.walk && player.isIdle){
+            switchAction(vaporeonAnimationClips.idle);
           }
-
-          //walking
-          if(player.isWalking && !vaporeonAnimationClips.walk.isRunning()){
-            vaporeonAnimationClips.walk.play();
-          }
-          if(!player.isWalking && vaporeonAnimationClips.walk.isRunning()){
-            vaporeonAnimationClips.walk.halt(0.2).stop();
-          }
-
-          //attack 1
-
-
+          
         }
 
 
@@ -241,6 +234,16 @@ socket.on('state', function(players) {
   }
   renderer.render(scene, camera);
 });
+
+function switchAction(toAction){
+  if(toAction != currentAction){
+    lastAction = currentAction;
+    currentAction = toAction;
+    lastAction.fadeOut(0.4);
+    currentAction.reset();
+    currentAction.fadeIn(0.2);
+  }
+}
 
 var objectLoader = new THREE.ObjectLoader();
 
