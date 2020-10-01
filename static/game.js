@@ -17,6 +17,12 @@ else if(char == "VAPOREON" || char == "Vaporeon" || char == "vaporeon"){
 }
 
 socket.emit('new player', {selected: character});
+
+//character animations
+var vaporeonMixer;
+var vaporeonLoaded = false;
+var vaporeonDone = false;
+
 var camera, fieldOfView, aspectRatio, nearPlane, farPlane,
     renderer, container, scene;
 
@@ -131,8 +137,12 @@ socket.on('dcplayer', function(removedPlayer){
 });
 
 // setInterval(function(){console.log(playerMeshes)}, 2000);
+var clock = new THREE.Clock();
+clock.start();
+var delta;
 
 socket.on('state', function(players) {
+  delta = clock.getDelta();
   for (var id in players) {
     var player = players[id];
     if (player != {}){
@@ -149,6 +159,20 @@ socket.on('state', function(players) {
                 createPlayer(id,player.color);
             }
         }
+
+        //setup mixer with mesh loaded, but not after it's already set up
+        if(player.character == "vaporeon"){
+          if(vaporeonLoaded &&!vaporeonDone){
+            vaporeonMixer = new THREE.AnimationMixer(playerMeshes[id]);
+            vaporeonDone = true;
+            var vaporeonWalk1Clip = THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001");
+            vaporeonMixer.clipAction(vaporeonWalk1Clip).play();
+          }
+          else if(vaporeonLoaded && vaporeonDone){
+            vaporeonMixer.update(delta);
+          }
+        }
+
         playerMeshes[id].position.set(player.x,player.y,player.z);
         playerMeshes[id].rotation.y = player.yrotation;
         //shrink player on death
@@ -158,7 +182,6 @@ socket.on('state', function(players) {
         else{
           playerMeshes[id].scale.set(1,1,1);
         }
-        // playerMeshes[id].body.head.horn.rotation.x+=0.01;
         if(socket.id == id){
             if(!player.isAlive){
                 document.getElementById("respawn").innerHTML = "You Died, Respawn in<br>"+Math.round((player.deathTimer*(1000/60))/1000)+" s";
