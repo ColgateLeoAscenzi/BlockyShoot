@@ -41,6 +41,10 @@ io.on('connection', function(socket) {
       isAlive: true,
       deathTimer: 300,
       character: info.selected,
+      isWalking: false,
+      isJumping: false,
+      isAttack1: false,
+      isAttack2: false
     };
     playercount+=1;
     var newPlayer = createPlayer(players[socket.id].color);
@@ -60,6 +64,7 @@ io.on('connection', function(socket) {
         player.yrotation+=0.05;
     }
     if (data.down && player.isAlive) {
+        player.isWalking = true;
         if(player.velocity + 0.25 < 2){
             player.velocity += 0.25;
         }
@@ -73,6 +78,7 @@ io.on('connection', function(socket) {
 
     }
     if (data.up && player.isAlive) {
+        player.isWalking = true;
         if(player.velocity - 0.25 > -2){
             player.velocity -= 0.25;
         }
@@ -121,6 +127,12 @@ io.on('connection', function(socket) {
 
     player.z+=player.velocity*Math.cos(player.yrotation);
     player.x+=player.velocity*Math.sin(player.yrotation);
+
+
+    //handle animations
+    if(Math.abs(player.velocity) < 0.01){
+      player.isWalking = false;
+    }
   });
 
   socket.on('disconnect', function() {
@@ -257,42 +269,5 @@ function updateBullets(){
             }
         }
 
-
-        // for (var id in players) {
-        //     player = players[id];
-        //     if (player != {}){
-        //         //check collision if not shot by same player
-        //         if(player.id != liveBullets[i].userData["shotBy"] && player.isAlive){
-        //         }
-        //     }
-        // }
-
-        // var bbox = new THREE.BoxHelper(liveBullets[i], 0xff0000)
-        // var BBOX = new THREE.Box3().setFromObject(bbox);
-        //
-        // for(var z = 0; z < objects.length; z++){
-        //     var bbox2 = new THREE.BoxHelper(objects[z], 0xff0000)
-        //     var BBOX2 = new THREE.Box3().setFromObject(bbox2);
-        //
-        //     if(myIntersect(objects[z], liveBullets[i])){
-        //         console.log("HIT");
-        //     }
-        // }
-
     }
 }
-
-// function myIntersect(object1, object2){
-//     object1.geometry.computeBoundingBox();
-//     object2.geometry.computeBoundingBox();
-//     object1.updateMatrixWorld();
-//     object2.updateMatrixWorld();
-//
-//     var box1 = object1.geometry.boundingBox.clone();
-//     box1.applyMatrix4(object1.matrixWorld);
-//
-//     var box2 = object2.geometry.boundingBox.clone();
-//     box2.applyMatrix4(object2.matrixWorld);
-//
-//     return box1.intersectsBox(box2);
-// }

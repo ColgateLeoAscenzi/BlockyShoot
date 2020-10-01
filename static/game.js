@@ -22,6 +22,7 @@ socket.emit('new player', {selected: character});
 var vaporeonMixer;
 var vaporeonLoaded = false;
 var vaporeonDone = false;
+var vaporeonAnimationClips = {idle: undefined, walk: undefined, attack1: undefined};
 
 var camera, fieldOfView, aspectRatio, nearPlane, farPlane,
     renderer, container, scene;
@@ -45,8 +46,6 @@ var mode = "online";
 createCanvas();
 
 createScene();
-
-// loop();
 
 setInterval(function() {
   socket.emit('movement', movement);
@@ -100,10 +99,6 @@ function handleWindowResize() {
   camera.updateProjectionMatrix();
 }
 
-// function loop() {
-//       renderer.render(scene, camera);
-//       requestAnimationFrame(loop);
-// }
 
 function createScene(){
     scene = new THREE.Scene();
@@ -165,16 +160,29 @@ socket.on('state', function(players) {
           if(vaporeonLoaded &&!vaporeonDone){
             vaporeonMixer = new THREE.AnimationMixer(playerMeshes[id]);
             vaporeonDone = true;
-            var vaporeonWalk1Clip = THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001");
-            vaporeonMixer.clipAction(vaporeonWalk1Clip).play();
+            vaporeonAnimationClips.walk = vaporeonMixer.clipAction(THREE.AnimationClip.findByName(vaporeonAnimations, "Walk.001"));
           }
           else if(vaporeonLoaded && vaporeonDone){
             vaporeonMixer.update(delta);
           }
         }
 
-        playerMeshes[id].position.set(player.x,player.y,player.z);
+        playerMeshes[id].position.set(player.x,5,player.z);
         playerMeshes[id].rotation.y = player.yrotation;
+
+
+        //handle animations
+        if(player.character == "vaporeon" && vaporeonDone){
+          if(player.isWalking && !vaporeonAnimationClips.walk.isRunning()){
+            vaporeonAnimationClips.walk.play();
+          }
+          if(!player.isWalking && vaporeonAnimationClips.walk.isRunning()){
+            vaporeonAnimationClips.walk.halt(0.1).reset();
+          }
+        }
+
+
+
         //shrink player on death
         if(!player.isAlive){
             playerMeshes[id].scale.set((Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10),(Math.max(0,player.deathTimer-290)/10));
@@ -182,6 +190,8 @@ socket.on('state', function(players) {
         else{
           playerMeshes[id].scale.set(1,1,1);
         }
+
+
         if(socket.id == id){
             if(!player.isAlive){
                 document.getElementById("respawn").innerHTML = "You Died, Respawn in<br>"+Math.round((player.deathTimer*(1000/60))/1000)+" s";
